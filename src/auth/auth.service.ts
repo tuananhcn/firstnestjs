@@ -1,9 +1,9 @@
 import { Injectable, Query, Req, Res } from '@nestjs/common';
-import { shopify } from 'src/main';
+import { shopify } from 'src/shopify';
 import { InjectRepository } from '@nestjs/typeorm';
 import { sessionEntity } from './sessionEntity';
 import { Repository } from 'typeorm';
-// import { callback } from '@shopify/shopify-api/lib/auth/oauth/oauth';
+import { Response } from 'express';
 @Injectable()
 export class AuthService {
     constructor(
@@ -20,13 +20,11 @@ export class AuthService {
             const Session = callback.session;
             await this.sessionRepository.save(Session);
             console.log("Saved session to db!");
-            return Session;
+            res.redirect("http://localhost:5173");
         }
         catch(err)
         {
             console.log(err);
         }
-        // console.log(res)
-        // res.Redirect('user');
     }
 }

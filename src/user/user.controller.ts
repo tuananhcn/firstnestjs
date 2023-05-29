@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { UserService } from './user.service';
-import { shopify } from 'src/main';
+// import { shopify } from 'src/main';
 import { CreateUserDto } from './createProduct.dto';
 import { createCustomer } from './createCustomer.dto';
 
@@ -9,7 +9,7 @@ export class UserController {
     constructor(private readonly userService: UserService){}
     @Get('products')
     async getProducts()
-    {
+    {   
         return this.userService.getProducts();
     }
     @Get('customers')

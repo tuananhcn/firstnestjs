@@ -1,5 +1,5 @@
 import { Controller, Get, Query, Redirect, Req, Res } from '@nestjs/common';
-import { shopify } from 'src/main';
+// import { shopify } from 'src/main';
 import { AuthService } from './auth.service';
 import { ApiVersion } from '@shopify/shopify-api';
 
