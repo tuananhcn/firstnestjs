@@ -19,6 +19,7 @@
 
         body {
             background-color: #6c5ce7;
+            margin: 0;
         }
 
         .container {
@@ -29,10 +30,6 @@
             border: solid #6c5ce7 20px;
             min-width: 745px;
         }
-
-        /* *{
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-} */
         .logo {
             margin-top: 35px;
             margin-left: 30px;
@@ -42,7 +39,6 @@
             background-color: #fca120;
             display: grid;
             grid-template-columns: 65% 1fr 1fr;
-            /* height: 50px; */
             margin-top: 30px;
         }
 
@@ -312,14 +308,14 @@
                 </div>
                 <div>
                     <div class="invoice__subtotal--item1">
-                        <p>Sub Total</p><span> $<%= others.subTotal %></span>
+                        <p>Sub Total</p><span> $<%= others.subToTal %></span>
                     </div>
                     <div class="invoice__subtotal--item1">
-                        <p>Tax(<%= others.tax%>)</p><span>$0.13</span>
+                        <p>Tax(<%= (others.tax*100).toPrecision(3) %>%)</p><span>$<%= others.tax*others.subToTal %></span>
                     </div>
-                    <% if(others.paymentDate != '') %>
+                    <% if(others.paymentDate.length) %>
                     <% { %>
-                    <div class="invoice__subtotal--item1"><p> Payment date: <%= others.paymentDate%></p></div>
+                    <div class="invoice__subtotal--item1"><p> Payment date: <%= others.paymentDate %></p></div>
                     <% } %>
                 </div>
             </div>
@@ -331,7 +327,7 @@
                 <div>
                     <div class="grand__total">
                         <div class="grand__total--items">
-                            <p>Grand Total</p><span><%= others.subTotal - others.subTotal* others.tax %></span>
+                            <p>Grand Total</p><span><%= others.subToTal - others.subTotal* others.tax %></span>
                         </div>
                     </div>
                 </div>

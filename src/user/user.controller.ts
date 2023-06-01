@@ -12,7 +12,7 @@ export class UserController {
     @Get('products')
     async getProducts()
     {   
-        return this.userService.getProducts();
+        return await this.userService.getProducts();
     }
     @Get('customers')
     async getCustomers()

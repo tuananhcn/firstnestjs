@@ -77,6 +77,7 @@ export class UserService {
     // })
     const newCustomer: customerEntity = {
       id: uuidv4(),
+      name: createCustomer.name,
       email: createCustomerDto.email,
       country: createCustomerDto.country,
       city: createCustomerDto.city
@@ -101,36 +102,12 @@ export class UserService {
     const customers = shopifyCustomers.map(async(shopifyCustomer) => {
       const customer = new customerEntity();
       customer.id = shopifyCustomer.id;
+      customer.name = shopifyCustomer.first_name + shopifyCustomer.last_name;
       customer.email = shopifyCustomer.email;
       customer.country = shopifyCustomer.country;
       customer.city = shopifyCustomer.city;
       await this.customerRepository.save(customer);
     })
     return "ok"
-  }
-  sendEmail(){
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: 'nguyenanhtuan2205tn@gmail.com',
-        pass: '@Anh2252003',
-      },
-    });
-    const mailOptions = {
-      from: "",
-      to: "",
-      subject: "",
-      text: "",
-    };
-    transporter.sendEmail(mailOptions, (error,info) => {
-      if(error) {
-        console.log("Error sending email:", error);
-      }
-      else {
-        console.log("Email sent:", info.response);
-      }
-    });
   }
 }

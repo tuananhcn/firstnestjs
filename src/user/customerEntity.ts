@@ -4,6 +4,9 @@ export class customerEntity{
     @PrimaryGeneratedColumn('uuid')
     id: number;
 
+    @Column()
+    name: string;
+
     @Column({nullable: true})
     email: string;
 

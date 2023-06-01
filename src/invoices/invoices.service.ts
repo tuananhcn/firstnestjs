@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as ejs from 'ejs';
 import puppeteer from 'puppeteer';
 import * as nodemailer from 'nodemailer'
+import { error } from 'console';
 @Injectable()
 export class InvoicesService {
     async sendEmail(data){
@@ -33,6 +34,17 @@ export class InvoicesService {
             console.error('Error sending email:', error);
           } 
     }
+    async writeToPdf(data){
+      const htmlBuffer = await this.renderHtmlTemplate(data);
+      const pdfBuffer = await this.generateInvoicePdf(data);
+      fs.writeFile('src/templates/output.pdf', pdfBuffer, (error) => {
+        if (error) {
+          console.error('Error writing PDF file:', error);
+        } else {
+          console.log('PDF file written successfully!');
+        }
+      })
+    }
     renderHtmlTemplate(data){
         const templatePath = "src/templates/invoice-template.ejs";
         const template = fs.readFileSync(templatePath, 'utf-8');
@@ -41,10 +53,16 @@ export class InvoicesService {
     }
     async generateInvoicePdf(data) {
         const browser = await puppeteer.launch();
-        const page = await browser.newPage();
+        const page = await browser.newPage(); 
+        // await page.setViewport({ width: 1000, height: 700 });
         await page.setContent(this.renderHtmlTemplate(data), { waitUntil: 'networkidle0' });
-        const pdfBuffer = await page.pdf({format: 'A4'});
+        const width = await page.evaluate(()=> document.documentElement.offsetWidth);
+        const height = await page.evaluate(()=> document.documentElement.offsetHeight);
+        const pdfBuffer = await page.pdf({ printBackground: true,width: width, height: height });
         await browser.close();
         return pdfBuffer;
+    }
+    test(data){
+      console.log(data);
     }
 }
