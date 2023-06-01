@@ -1,8 +1,10 @@
 import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 // import { shopify } from 'src/main';
-import { CreateUserDto } from './createProduct.dto';
+import { CreateProductDto } from './createProduct.dto';
 import { createCustomer } from './createCustomer.dto';
+import { productEntity } from './productEntity';
+import { title } from 'process';
 
 @Controller('user')
 export class UserController {
@@ -18,19 +20,16 @@ export class UserController {
         return this.userService.getCustomers();
     }
     @Post('products')
-    async createProduct(@Body() createUserDto: CreateUserDto)
+    async createProduct(@Body() createProductDto: CreateProductDto)
     {
-        return this.userService.createProducts(createUserDto);
+        // console.log(createProductDto);
+        return this.userService.createProducts(createProductDto);
     }
     @Post('customers')
     async createCustomer(@Body() createCustomerDto: createCustomer)
     {
-        try {
-            this.userService.createCustomers(createCustomerDto);
-            return "Successfully created!";
-        } catch (error) {
-            return error;
-        }
+        return this.userService.createCustomers(createCustomerDto);
+        // return "Successfully created!";
     }
     
 }

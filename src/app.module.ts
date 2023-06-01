@@ -9,6 +9,7 @@ import { productEntity } from './user/productEntity';
 import { customerEntity } from './user/customerEntity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { shopify } from 'src/shopify';
+import { InvoicesModule } from './invoices/invoices.module';
 
 @Module({
   imports: [AuthModule, ConfigModule.forRoot({isGlobal: true}), UserModule, TypeOrmModule.forRoot({
@@ -20,7 +21,7 @@ import { shopify } from 'src/shopify';
     database: 'test',
     entities: [sessionEntity,productEntity,customerEntity],
     synchronize: true,
-  })],
+  }), InvoicesModule],
   controllers: [AppController],
   providers: [AppService],
 })

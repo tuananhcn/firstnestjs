@@ -3,13 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ApiVersion, DataType } from '@shopify/shopify-api';
 import { sessionEntity } from 'src/auth/sessionEntity';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './createProduct.dto';
+import { CreateProductDto } from './createProduct.dto';
 import { createCustomer } from './createCustomer.dto';
 import { productEntity } from './productEntity';
 import { customerEntity } from './customerEntity';
 import { Product } from '@shopify/shopify-api/rest/admin/2022-07/product';
 import { async } from 'rxjs';
 import { shopify } from 'src/shopify';
+import * as nodemailer from 'nodemailer';
+
+// import { UUID } from 'typeorm/driver/mongodb/bson.typings';
+import { v4 as uuidv4 } from 'uuid';
 // import { getClientBySession }
 @Injectable()
 export class UserService {
@@ -36,42 +40,48 @@ export class UserService {
     const query = "SELECT * FROM customer_entity";
     return (await this.customerRepository.query(query));
   }
-  async createProducts(createUserDto: CreateUserDto) {
-    // try {
-    const client = new shopify.clients.Rest({
-      session: await this.getSession(),
-      apiVersion: ApiVersion.January23,
-    });
-    const postResponse = await (client).post({
-      path: 'products',
-      data: {
-        product: {
-          title: createUserDto.title
-        }
-      },
-      type: DataType.JSON,
-    });
-    console.log(postResponse.body);
-    return postResponse;
-    // } catch (error) {
-    //   console.log(error)
-    // } 
+  async createProducts(createProductDto: CreateProductDto) {
+    // const client = new shopify.clients.Rest({
+    //   session: await this.getSession(),
+    //   apiVersion: ApiVersion.January23,
+    // });
+    // const postResponse = await (client).post({
+    //   path: 'products',
+    //   data: {
+    //     product: {
+    //       title: createUserDto.title
+    //     }
+    //   },
+    //   type: DataType.JSON,
+    // });
+    // console.log(postResponse.body);
+    // return postResponse;
+    console.log(createProductDto);    
+    const newProduct: productEntity = {
+      id: uuidv4(),
+      title: createProductDto.title,
+      body_html: createProductDto.body_html
+    }
+    // console.log(newProduct);
+    return this.productRepository.save(newProduct);
   }
   async createCustomers(createCustomerDto: createCustomer) {
-    // try {
-    const customer = new shopify.rest.Customer({
-      session: await this.getSession()
-      // apiVersion: ApiVersion.January23,
-    });
-    customer.last_name = createCustomerDto.last_name;
-    customer.first_name = createCustomerDto.first_name;
-    customer.email = createCustomerDto.email;
-    // } catch (error) {
-    //   console.log(error)
-    // } 
-    await customer.save({
-      update: true,
-    })
+    // const customer = new shopify.rest.Customer({
+    //   session: await this.getSession()
+    // });
+    // customer.last_name = createCustomerDto.last_name;
+    // customer.first_name = createCustomerDto.first_name;
+    // customer.email = createCustomerDto.email;
+    // await customer.save({
+    //   update: true,
+    // })
+    const newCustomer: customerEntity = {
+      id: uuidv4(),
+      email: createCustomerDto.email,
+      country: createCustomerDto.country,
+      city: createCustomerDto.city
+    }
+    return this.customerRepository.save(newCustomer);
   }
   async saveProducts() {
     const shopifyProducts = (await shopify.rest.Product.all({
@@ -98,5 +108,29 @@ export class UserService {
     })
     return "ok"
   }
-  
+  sendEmail(){
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'nguyenanhtuan2205tn@gmail.com',
+        pass: '@Anh2252003',
+      },
+    });
+    const mailOptions = {
+      from: "",
+      to: "",
+      subject: "",
+      text: "",
+    };
+    transporter.sendEmail(mailOptions, (error,info) => {
+      if(error) {
+        console.log("Error sending email:", error);
+      }
+      else {
+        console.log("Email sent:", info.response);
+      }
+    });
+  }
 }

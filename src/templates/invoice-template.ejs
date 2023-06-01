@@ -1,0 +1,342 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <link rel="icon" href="/favicon.ico"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/3f4efd766c.js" crossorigin="anonymous"></script>
+    <title>Invoice Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+            text-decoration: none;
+            list-style: none;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #6c5ce7;
+        }
+
+        .container {
+            margin: 0 auto auto auto;
+            color: black;
+            min-height: 100%;
+            background: #f1f1f1;
+            border: solid #6c5ce7 20px;
+            min-width: 745px;
+        }
+
+        /* *{
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+} */
+        .logo {
+            margin-top: 35px;
+            margin-left: 30px;
+        }
+
+        .invoice__header--title {
+            background-color: #fca120;
+            display: grid;
+            grid-template-columns: 65% 1fr 1fr;
+            /* height: 50px; */
+            margin-top: 30px;
+        }
+
+        .invoice__header--title1 {
+            font-size: 36px;
+            padding: 0 45px;
+            text-transform: uppercase;
+            text-align: center;
+            font-weight: bold;
+            background-color: #f1f1f1;
+        }
+
+        /* .setting {
+            background-color: #e4e0ff;
+            user-select: none;
+            font-size: 18px;
+            height: 400px;
+            width: 300px;
+            position: fixed;
+            bottom: 135px;
+            right: 60px;
+            border-radius: 12px;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 6px 6px 0 rgba(0, 0, 0, 0.02), 0 8px 24px 0 rgba(0, 0, 0, 0.12);
+            opacity: 0;
+            display: grid;
+            row-gap: 10px;
+        } */
+
+        .invoice__header--item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 45px;
+            font-size: 20px;
+        }
+
+        .invoice__header--item1 {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .invoice__header--item h2 {
+            margin: 20px 0;
+        }
+
+        .settingNumberInput {
+            width: 70%;
+        }
+
+        .table--heading3 {
+            display: grid;
+            grid-template-columns: 1fr 500px 1fr 1fr 1fr;
+            background-color: black;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px;
+        }
+
+        .table--items3 {
+            display: grid;
+            grid-template-columns: 1fr 500px 1fr 1fr 1fr;
+            padding: 10px 0 10px 13px;
+            border: solid #000 1px;
+        }
+
+        .invoice__subtotal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 250px;
+            padding: 20px 50px 10px 50px;
+            /* margin-top: auto;
+  margin-bottom: auto; */
+        }
+
+        /* .test{
+  position: absolute;
+  bottom: 10px;
+} */
+        .invoice__total {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 250px;
+            padding: 20px 50px 10px 50px;
+            margin-bottom: 10px;
+        }
+
+        .invoice__subtotal--item1 {
+            font-size: 20px;
+            display: flex;
+            justify-content: space-between;
+            justify-self: center;
+        }
+
+        .grand__total--items {
+            background-color: #fca120;
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        button#setting {
+            position: fixed;
+            right: 60px;
+            width: 60px;
+            height: 60px;
+            bottom: 60px;
+            font-size: 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            background-color: #6c5ce7;
+            border-radius: 100%;
+            user-select: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: 0.4s;
+            transition: 0.4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: 0.4s;
+            transition: 0.4s;
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        input:checked+.slider {
+            background-color: #2196f3;
+        }
+
+        button#setting:hover {
+            scale: 1.1;
+            background-color: #4c38e4;
+        }
+
+        .btn__setting {
+            background: none;
+            border: none;
+            background-color: rgb(54, 5, 152);
+            padding: 15px 20px;
+            cursor: pointer;
+        }
+
+        input[type="date"],
+        input[type="number"] {
+            height: 34px;
+            width: 100%;
+        }
+
+        .settingTextInput {
+            display: inline-block;
+            margin-left: 80px;
+            margin-top: 10px;
+            width: 50%;
+        }
+
+        @media print {
+
+            .setting,
+            button#setting {
+                visibility: hidden;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo"><img src="<%= others.imgURL %>" alt="logo" style="width: 200px;"></div>
+        <div class="invoice__header--title">
+            <p></p>
+            <p class="invoice__header--title1">INVOICE</p>
+            <p></p>
+        </div>
+        <div class="invoice__header--item">
+            <div>
+                <p style="font-weight: bold;">Customer information:</p>
+                <p>Customer Name: <%= customer.name %></p>
+                <p>Email: <%= customer.email %></p>
+                <p>Invoice date: <%= customer.Invoicedate %></p>
+                <p>Customer address: <%= customer.address %></p>
+                <p>City: <%= customer.city %></p>
+                <p>Country: <%= customer.country %></p>
+                <p>State: <%= customer.state %></p>
+                <p>Zipcode: <%= customer.zipcode %></p>
+            </div>
+            <div>
+                <div class="invoice__header--item1">
+                    <p>Invoice#</p><span><%= customer.invoiceNumber %></span>
+                </div>
+                <div class="invoice__header--item1">
+                    <p>Company Name:</p><span><%= company.name %></span>
+                </div>
+                <div class="invoice__header--item1">
+                    <p>City</p><span><%= company.city %></span>
+                </div>
+                <div class="invoice__header--item1">
+                    <p>Zipcode:</p><span><%= company.zipcode %></span>
+                </div>
+                <div class="invoice__header--item1">
+                    <p>Country</p><span><%= company.country %></span>
+                </div>
+                <div class="invoice__header--item1">
+                    <p>State</p><span><%= company.state %></span>
+                </div>
+            </div>
+        </div>
+        <div class="table py1">
+            <div class="table--heading3">
+                <p>#</p>
+                <p>Product</p>
+                <p>Price</p>
+                <p>Qty</p>
+                <p>Amount</p>
+            </div>
+            <div class="table--items3">
+                <% if(itemBill.length) %>
+                <% { %>
+                    <% for(let i = 0; i < itemBill.length; i++) { %>
+                        <p><%= i+1 %></p>
+                        <p><%= itemBill[i].Item %></p>
+                        <p><%= itemBill[i].Price %></p>
+                        <p><%= itemBill[i].Quantity %></p>
+                        <p><%= itemBill[i].Price * itemBill[i].Quantity %></p>
+                    <% } %> 
+                <% } %>
+            </div>
+        </div>
+        <div class="test">
+            <div class="invoice__subtotal">
+                <div>
+                    <h2>Thank you for your business</h2>
+                </div>
+                <div>
+                    <div class="invoice__subtotal--item1">
+                        <p>Sub Total</p><span> $<%= others.subTotal %></span>
+                    </div>
+                    <div class="invoice__subtotal--item1">
+                        <p>Tax(<%= others.tax%>)</p><span>$0.13</span>
+                    </div>
+                    <% if(others.paymentDate != '') %>
+                    <% { %>
+                    <div class="invoice__subtotal--item1"><p> Payment date: <%= others.paymentDate%></p></div>
+                    <% } %>
+                </div>
+            </div>
+            <div class="invoice__total">
+                <div>
+                    <h2>Terms and Conditions</h2>
+                    <p> Lorem Ipsum is simply dummy text of the printing and type setting industry. </p>
+                </div>
+                <div>
+                    <div class="grand__total">
+                        <div class="grand__total--items">
+                            <p>Grand Total</p><span><%= others.subTotal - others.subTotal* others.tax %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+
+</html>
