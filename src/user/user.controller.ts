@@ -25,13 +25,22 @@ export class UserController {
     @Post('products')
     async createProduct(@Body() createProductDto: CreateProductDto)
     {
-        // console.log(createProductDto);
-        return this.userService.createProducts(createProductDto);
+        try {
+            await this.userService.createProducts(createProductDto);
+            return "Created successfully!";
+        } catch (error) {
+            return error;
+        }
     }
     @Post('customers')
     async createCustomer(@Body() createCustomerDto: CreateCustomerDto)
     {
-        return this.userService.createCustomers(createCustomerDto);
+        try {
+            await this.userService.createCustomers(createCustomerDto);
+            return "Created successfully!"
+        } catch (error) {
+            return error;
+        }
         // return "Successfully created!";
     }
     @Get('receiveData')

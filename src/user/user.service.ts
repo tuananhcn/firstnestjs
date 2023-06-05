@@ -32,9 +32,16 @@ export class UserService {
     console.log(Session);
     return Session;
   }
+  generateUniqueNumberId():number {
+    const timestamp = Date.now().toString(); // Get current timestamp as a string
+    const randomNum = Math.floor(Math.random() * 9000000000) + 1000000000; // Generate a random 10-digit number
+    const uniqueId = parseInt(timestamp + randomNum.toString().slice(-3), 10);
+    return uniqueId;
+  }
   async getProducts(id: any) {
     const shop = await (await this.getSession(id)).shop;
     const query = `SELECT * FROM product_entity where shop = "${shop}"`;
+    console.log(this.generateUniqueNumberId());
     return (await this.productRepository.query(query));
   }
   async getCustomers(id) {
@@ -61,12 +68,13 @@ export class UserService {
     // console.log(createProductDto);
     // const shop = await (await this.getSession(id)).shop;    
     const newProduct: productEntity = {
-      id: uuidv4(),
-      shop: createProductDto.shop,
+      id: this.generateUniqueNumberId(),
       title: createProductDto.title,
+      shop: createProductDto.shop,
       body_html: createProductDto.body_html
     }
-    // console.log(newProduct);
+    console.log(createProductDto)
+    console.log(newProduct);
     return this.productRepository.save(newProduct);
   }
   async createCustomers(createCustomerDto: CreateCustomerDto) {
@@ -81,14 +89,14 @@ export class UserService {
     // })
     // const shop = await (await this.getSession(id)).shop;
     const newCustomer: customerEntity = {
-      id: uuidv4(),
-      shop: createCustomerDto.shop,
+      id: this.generateUniqueNumberId(),
       name: createCustomerDto.name,
+      shop: createCustomerDto.shop,
       email: createCustomerDto.email,
       country: createCustomerDto.country,
       city: createCustomerDto.city
     }
-    return this.customerRepository.save(newCustomer);
+    await this.customerRepository.save(newCustomer);
   }
   async saveProducts(id) {
     const shopifyProducts = (await shopify.rest.Product.all({

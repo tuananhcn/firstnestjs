@@ -7,8 +7,8 @@ export class InvoicesController {
     @Post('send')
     async sendEmail(@Body() body: any){
         try {
-            await this.invoiceService.test(body);
-            console.log(typeof(body.others.paymentDate));
+            await this.invoiceService.sendEmail(body);
+            // console.log(typeof(body.others.paymentDate));
             return "Email sent successfully!"
         } catch (error) {
             return error;

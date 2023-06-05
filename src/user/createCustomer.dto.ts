@@ -1,7 +1,6 @@
 export class CreateCustomerDto{
-    id: number;
-    shop: string;
     name: string;
+    shop: string;
     email: string;
     country: string;
     city: string;
