@@ -1,5 +1,6 @@
-export class createCustomer{
-    id: string;
+export class CreateCustomerDto{
+    id: number;
+    shop: string;
     name: string;
     email: string;
     country: string;

@@ -4,7 +4,7 @@ import { ApiVersion, DataType } from '@shopify/shopify-api';
 import { sessionEntity } from 'src/auth/sessionEntity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './createProduct.dto';
-import { createCustomer } from './createCustomer.dto';
+import { CreateCustomerDto } from './createCustomer.dto';
 import { productEntity } from './productEntity';
 import { customerEntity } from './customerEntity';
 import { Product } from '@shopify/shopify-api/rest/admin/2022-07/product';
@@ -25,19 +25,21 @@ export class UserService {
     @InjectRepository(customerEntity)
     private readonly customerRepository: Repository<customerEntity>) { }
 
-  async getSession() { 
-    const query = "SELECT * FROM session_entity where id = 'offline_gumbee-14526.myshopify.com'"
+  async getSession(id) { 
+    const query = `SELECT * FROM session_entity where id = "${id}"`
     const Session = (await this.sessionRepository.query(query))[0];
     Session.isOnline = (Session.isOnline == 1 ? true : false);
     console.log(Session);
     return Session;
   }
-  async getProducts() {
-    const query = "SELECT * FROM product_entity";
+  async getProducts(id: any) {
+    const shop = await (await this.getSession(id)).shop;
+    const query = `SELECT * FROM product_entity where shop = "${shop}"`;
     return (await this.productRepository.query(query));
   }
-  async getCustomers() {
-    const query = "SELECT * FROM customer_entity";
+  async getCustomers(id) {
+    const shop = await (await this.getSession(id)).shop;
+    const query = `SELECT * FROM customer_entity where shop = "${shop}"`;
     return (await this.customerRepository.query(query));
   }
   async createProducts(createProductDto: CreateProductDto) {
@@ -56,16 +58,18 @@ export class UserService {
     // });
     // console.log(postResponse.body);
     // return postResponse;
-    console.log(createProductDto);    
+    // console.log(createProductDto);
+    // const shop = await (await this.getSession(id)).shop;    
     const newProduct: productEntity = {
       id: uuidv4(),
+      shop: createProductDto.shop,
       title: createProductDto.title,
       body_html: createProductDto.body_html
     }
     // console.log(newProduct);
     return this.productRepository.save(newProduct);
   }
-  async createCustomers(createCustomerDto: createCustomer) {
+  async createCustomers(createCustomerDto: CreateCustomerDto) {
     // const customer = new shopify.rest.Customer({
     //   session: await this.getSession()
     // });
@@ -75,39 +79,44 @@ export class UserService {
     // await customer.save({
     //   update: true,
     // })
+    // const shop = await (await this.getSession(id)).shop;
     const newCustomer: customerEntity = {
       id: uuidv4(),
-      name: createCustomer.name,
+      shop: createCustomerDto.shop,
+      name: createCustomerDto.name,
       email: createCustomerDto.email,
       country: createCustomerDto.country,
       city: createCustomerDto.city
     }
     return this.customerRepository.save(newCustomer);
   }
-  async saveProducts() {
+  async saveProducts(id) {
     const shopifyProducts = (await shopify.rest.Product.all({
-      session: await this.getSession()})).data;
+      session: await this.getSession(id)})).data;
     const products = shopifyProducts.map(async(shopifyProduct) => {
       const product = new productEntity();
       product.id = shopifyProduct.id;
+      product.shop = await (await this.getSession(id)).shop;
       product.title = shopifyProduct.title;
       product.body_html = shopifyProduct.body_html;
       await this.productRepository.save(product);
     })
-    return "ok"
+    // return "ok"
   }
-  async saveCustomers() {
+  async saveCustomers(id) {
+    // console.log(1)
     const shopifyCustomers = (await shopify.rest.Customer.all({
-      session: await this.getSession()})).data;
+      session: await this.getSession(id)})).data;
     const customers = shopifyCustomers.map(async(shopifyCustomer) => {
       const customer = new customerEntity();
       customer.id = shopifyCustomer.id;
-      customer.name = shopifyCustomer.first_name + shopifyCustomer.last_name;
+      customer.shop = await (await this.getSession(id)).shop;
+      customer.name = `${shopifyCustomer.first_name} ${shopifyCustomer.last_name}`;
       customer.email = shopifyCustomer.email;
       customer.country = shopifyCustomer.country;
       customer.city = shopifyCustomer.city;
       await this.customerRepository.save(customer);
     })
-    return "ok"
+    // return "ok"
   }
 }

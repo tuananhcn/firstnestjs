@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { productEntity } from "src/user/productEntity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class sessionEntity{
     @PrimaryGeneratedColumn('uuid')
@@ -6,7 +7,7 @@ export class sessionEntity{
 
     @Column({ nullable: false })
     shop: string;
-
+    
     @Column({ nullable: false })
     state: string;
 

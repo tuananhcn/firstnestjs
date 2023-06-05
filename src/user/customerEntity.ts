@@ -1,9 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { sessionEntity } from "src/auth/sessionEntity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class customerEntity{
     @PrimaryGeneratedColumn('uuid')
     id: number;
-
+    @Column()
+    shop: string;
+    // @ManyToOne(() => sessionEntity, session => session.shop)
+    // session: sessionEntity;
+    
     @Column()
     name: string;
 
