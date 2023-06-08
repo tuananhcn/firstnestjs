@@ -4,6 +4,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 export class customerEntity{
     @PrimaryGeneratedColumn('uuid')
     id: number;
+    
     @Column()
     shop: string;
     // @ManyToOne(() => sessionEntity, session => session.shop)

@@ -107,7 +107,14 @@ export class UserService {
       product.shop = await (await this.getSession(id)).shop;
       product.title = shopifyProduct.title;
       product.body_html = shopifyProduct.body_html;
-      await this.productRepository.save(product);
+      // await this.productRepository.save(product);
+      this.productRepository
+      .createQueryBuilder()
+      .insert()
+      .into(productEntity)
+      .values(product)
+      .orUpdate({ conflict_target: ['id'], overwrite: ['title'] })
+      .execute();
     })
     // return "ok"
   }
@@ -123,7 +130,14 @@ export class UserService {
       customer.email = shopifyCustomer.email;
       customer.country = shopifyCustomer.country;
       customer.city = shopifyCustomer.city;
-      await this.customerRepository.save(customer);
+      // await this.customerRepository.save(customer);
+      this.customerRepository
+      .createQueryBuilder()
+      .insert()
+      .into(customerEntity)
+      .values(customer)
+      .orUpdate({ conflict_target: ['id'], overwrite: ['name'] })
+      .execute();
     })
     // return "ok"
   }

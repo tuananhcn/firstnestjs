@@ -20,16 +20,22 @@
         body {
             background-color: #6c5ce7;
             margin: 0;
+            height: 100%;
+            width: 100%;
+            min-height: 800px;
+            min-width: 1000px;
+            /* margin-bottom: 30px; */
         }
 
         .container {
             margin: 0 auto auto auto;
             color: black;
-            min-height: 100%;
+            height: 100%;
             background: #f1f1f1;
             border: solid #6c5ce7 20px;
             min-width: 745px;
         }
+
         .logo {
             margin-top: 35px;
             margin-left: 30px;
@@ -50,23 +56,6 @@
             font-weight: bold;
             background-color: #f1f1f1;
         }
-
-        /* .setting {
-            background-color: #e4e0ff;
-            user-select: none;
-            font-size: 18px;
-            height: 400px;
-            width: 300px;
-            position: fixed;
-            bottom: 135px;
-            right: 60px;
-            border-radius: 12px;
-            transition: opacity 0.2s ease;
-            box-shadow: 0 6px 6px 0 rgba(0, 0, 0, 0.02), 0 8px 24px 0 rgba(0, 0, 0, 0.12);
-            opacity: 0;
-            display: grid;
-            row-gap: 10px;
-        } */
 
         .invoice__header--item {
             display: grid;
@@ -91,7 +80,7 @@
 
         .table--heading3 {
             display: grid;
-            grid-template-columns: 1fr 500px 1fr 1fr 1fr;
+            grid-template-columns: 1fr 400px 1fr 1fr 1fr;
             background-color: black;
             color: #fff;
             font-size: 20px;
@@ -101,7 +90,7 @@
 
         .table--items3 {
             display: grid;
-            grid-template-columns: 1fr 500px 1fr 1fr 1fr;
+            grid-template-columns: 1fr 400px 1fr 1fr 1fr;
             padding: 10px 0 10px 13px;
             border: solid #000 1px;
         }
@@ -125,6 +114,7 @@
             grid-gap: 250px;
             padding: 20px 50px 10px 50px;
             margin-bottom: 10px;
+            padding-bottom: 25px;
         }
 
         .invoice__subtotal--item1 {
@@ -222,20 +212,13 @@
             width: 100%;
         }
 
+        /* 
         .settingTextInput {
             display: inline-block;
             margin-left: 80px;
             margin-top: 10px;
             width: 50%;
-        }
-
-        @media print {
-
-            .setting,
-            button#setting {
-                visibility: hidden;
-            }
-        }
+        } */
     </style>
 </head>
 
@@ -250,33 +233,53 @@
         <div class="invoice__header--item">
             <div>
                 <p style="font-weight: bold;">Customer information:</p>
-                <p>Customer Name: <%= customer.name %></p>
-                <p>Email: <%= customer.email %></p>
-                <p>Invoice date: <%= customer.Invoicedate %></p>
-                <p>Customer address: <%= customer.address %></p>
-                <p>City: <%= customer.city %></p>
-                <p>Country: <%= customer.country %></p>
-                <p>State: <%= customer.state %></p>
-                <p>Zipcode: <%= customer.zipcode %></p>
+                <p>Customer Name: <%= customer.name %>
+                </p>
+                <p>Email: <%= customer.email %>
+                </p>
+                <p>Invoice date: <%= customer.Invoicedate %>
+                </p>
+                <p>Customer address: <%= customer.address %>
+                </p>
+                <p>City: <%= customer.city %>
+                </p>
+                <p>Country: <%= customer.country %>
+                </p>
+                <p>State: <%= customer.state %>
+                </p>
+                <p>Zipcode: <%= customer.zipcode %>
+                </p>
             </div>
             <div>
                 <div class="invoice__header--item1">
-                    <p>Invoice#</p><span><%= customer.invoiceNumber %></span>
+                    <p>Invoice#</p><span>
+                        <%= customer.invoiceNumber %>
+                    </span>
                 </div>
                 <div class="invoice__header--item1">
-                    <p>Company Name:</p><span><%= company.name %></span>
+                    <p>Company Name:</p><span>
+                        <%= company.name %>
+                    </span>
                 </div>
                 <div class="invoice__header--item1">
-                    <p>City</p><span><%= company.city %></span>
+                    <p>City</p><span>
+                        <%= company.city %>
+                    </span>
                 </div>
                 <div class="invoice__header--item1">
-                    <p>Zipcode:</p><span><%= company.zipCode %></span>
+                    <p>Zipcode:</p><span>
+                        <%= company.zipCode %>
+                    </span>
                 </div>
                 <div class="invoice__header--item1">
-                    <p>Country</p><span><%= company.country %></span>
+                    <p>Country</p><span>
+                        <%= company.country %>
+                    </span>
                 </div>
                 <div class="invoice__header--item1">
-                    <p>State</p><span><%= company.state %></span>
+                    <p>State</p><span>
+                        <%= company.state %>
+                    </span>
                 </div>
             </div>
         </div>
@@ -288,18 +291,27 @@
                 <p>Qty</p>
                 <p>Amount</p>
             </div>
-            <div class="table--items3">
-                <% if(itemBill.length) %>
-                <% { %>
-                    <% for(let i = 0; i < itemBill.length; i++) { %>
-                        <p><%= i+1 %></p>
-                        <p><%= itemBill[i].Item %></p>
-                        <p><%= itemBill[i].Price %></p>
-                        <p><%= itemBill[i].Quantity %></p>
-                        <p><%= itemBill[i].Price * itemBill[i].Quantity %></p>
-                    <% } %> 
-                <% } %>
-            </div>
+            <% if(itemBill.length) { %>
+                <% for(let i=0; i < itemBill.length; i++) { %>
+                    <div class="table--items3">
+                        <p>
+                            <%= i+1 %>
+                        </p>
+                        <p>
+                            <%= itemBill[i].Item %>
+                        </p>
+                        <p>
+                            <%= itemBill[i].Price %>
+                        </p>
+                        <p>
+                            <%= itemBill[i].Quantity %>
+                        </p>
+                        <p>
+                            <%= itemBill[i].Price * itemBill[i].Quantity %>
+                        </p>
+                    </div>
+                    <% } %>
+                        <% } %>
         </div>
         <div class="test">
             <div class="invoice__subtotal">
@@ -311,12 +323,15 @@
                         <p>Sub Total</p><span> $<%= others.subToTal %></span>
                     </div>
                     <div class="invoice__subtotal--item1">
-                        <p>Tax(<%= (others.tax*100).toPrecision(3) %>%)</p><span>$<%= others.tax*others.subToTal %></span>
+                        <p>Tax(<%= (others.tax*100).toPrecision(3) %>%)</p><span>$<%= others.tax*others.subToTal %>
+                        </span>
                     </div>
-                    <% if(others.paymentDate.length) %>
-                    <% { %>
-                    <div class="invoice__subtotal--item1"><p> Payment date: <%= others.paymentDate %></p></div>
-                    <% } %>
+                    <%if (others.paymentDate !=='' ) { %>
+                        <div class="invoice__subtotal--item1">
+                            <p> Payment date: <%= others.paymentDate %>
+                            </p>
+                        </div>
+                        <% } %>
                 </div>
             </div>
             <div class="invoice__total">
@@ -327,12 +342,17 @@
                 <div>
                     <div class="grand__total">
                         <div class="grand__total--items">
-                            <p>Grand Total</p><span><%= others.subToTal - others.subToTal* others.tax %></span>
+                            <p>Grand Total</p><span>
+                                $<%= others.subToTal - others.subToTal* others.tax %>
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    <script>
+    </script>
 </body>
 
 </html>

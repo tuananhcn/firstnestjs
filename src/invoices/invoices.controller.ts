@@ -8,12 +8,9 @@ export class InvoicesController {
     async sendEmail(@Body() body: any){
         try {
             await this.invoiceService.sendEmail(body);
-            // console.log(typeof(body.others.paymentDate));
-            return "Email sent successfully!"
         } catch (error) {
             return error;
         }
-        // console.log(body.itemBill);
+        return "Email sent successfully!";
     }
-    
 }

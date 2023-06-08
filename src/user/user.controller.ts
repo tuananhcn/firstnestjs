@@ -46,6 +46,7 @@ export class UserController {
     @Get('receiveData')
     async getDataFromShopify(@Query() params: any)
     {
+        console.log(1)
         params.id = `offline_${params.id}.myshopify.com`;
         try {
         await this.userService.saveCustomers(params.id);
