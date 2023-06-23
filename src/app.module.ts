@@ -21,7 +21,7 @@ import { InvoicesModule } from './invoices/invoices.module';
     database: 'test',
     entities: [sessionEntity,productEntity,customerEntity],
     synchronize: true,
-  }), InvoicesModule],
+  }), InvoicesModule, TypeOrmModule.forFeature([sessionEntity])],
   controllers: [AppController],
   providers: [AppService],
 })

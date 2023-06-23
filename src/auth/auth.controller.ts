@@ -3,11 +3,11 @@ import { Controller, Get, Query, Redirect, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiVersion } from '@shopify/shopify-api';
 
-@Controller('api')
+@Controller('')
 // @Redirect('user')
 export class AuthController {
     constructor(private readonly authService: AuthService){}
-    @Get('auth')
+    @Get('api/redirect')
     async getUsers(@Req() req, @Res() res)
     {
         return await this.authService.saveUserSession(req,res);
@@ -16,6 +16,10 @@ export class AuthController {
         // const Session = Sessions[0];   
         // res.json(await this.authService.getSessionBySessionId(callback));
     }
-
+    @Get('api/auth')
+    async redirectToShopify(@Req() req, @Res() res, @Query() query)
+    {
+        await this.authService.redirect(req,res,query)
+    }
 }
 

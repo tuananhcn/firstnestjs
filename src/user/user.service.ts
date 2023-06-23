@@ -1,4 +1,4 @@
-import { Body, Inject, Injectable } from '@nestjs/common';
+import { Body, Header, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApiVersion, DataType } from '@shopify/shopify-api';
 import { sessionEntity } from 'src/auth/sessionEntity';
@@ -11,9 +11,12 @@ import { Product } from '@shopify/shopify-api/rest/admin/2022-07/product';
 import { async } from 'rxjs';
 import { shopify } from 'src/shopify';
 import * as nodemailer from 'nodemailer';
-
+import axios from 'axios';
+import * as jwt from "jsonwebtoken";
 // import { UUID } from 'typeorm/driver/mongodb/bson.typings';
 import { v4 as uuidv4 } from 'uuid';
+import * as dotenv from 'dotenv';
+dotenv.config()
 // import { getClientBySession }
 @Injectable()
 export class UserService {
@@ -25,11 +28,11 @@ export class UserService {
     @InjectRepository(customerEntity)
     private readonly customerRepository: Repository<customerEntity>) { }
 
-  async getSession(id) { 
-    const query = `SELECT * FROM session_entity where id = "${id}"`
+  async getSession(token) {
+    const shopifyToken = jwt.verify(token, process.env.secretToken).accessToken
+    const query = `SELECT * FROM session_entity where accessToken = "${shopifyToken}"`
     const Session = (await this.sessionRepository.query(query))[0];
     Session.isOnline = (Session.isOnline == 1 ? true : false);
-    console.log(Session);
     return Session;
   }
   generateUniqueNumberId():number {
@@ -38,18 +41,19 @@ export class UserService {
     const uniqueId = parseInt(timestamp + randomNum.toString().slice(-3), 10);
     return uniqueId;
   }
-  async getProducts(id: any) {
-    const shop = await (await this.getSession(id)).shop;
+  async getProducts(token) {
+    const shop = await (await this.getSession(token)).shop
+    console.log(shop)
     const query = `SELECT * FROM product_entity where shop = "${shop}"`;
     console.log(this.generateUniqueNumberId());
     return (await this.productRepository.query(query));
   }
-  async getCustomers(id) {
-    const shop = await (await this.getSession(id)).shop;
+  async getCustomers(token) {
+    const shop = await (await this.getSession(token)).shop;
     const query = `SELECT * FROM customer_entity where shop = "${shop}"`;
     return (await this.customerRepository.query(query));
   }
-  async createProducts(createProductDto: CreateProductDto) {
+  async createProducts(createProductDto: CreateProductDto, token) {
     // const client = new shopify.clients.Rest({
     //   session: await this.getSession(),
     //   apiVersion: ApiVersion.January23,
@@ -67,17 +71,18 @@ export class UserService {
     // return postResponse;
     // console.log(createProductDto);
     // const shop = await (await this.getSession(id)).shop;    
+    const shop = await (await this.getSession(token)).shop;
     const newProduct: productEntity = {
       id: this.generateUniqueNumberId(),
       title: createProductDto.title,
-      shop: createProductDto.shop,
+      shop: shop,
       body_html: createProductDto.body_html
     }
     console.log(createProductDto)
     console.log(newProduct);
     return this.productRepository.save(newProduct);
   }
-  async createCustomers(createCustomerDto: CreateCustomerDto) {
+  async createCustomers(createCustomerDto: CreateCustomerDto, token) {
     // const customer = new shopify.rest.Customer({
     //   session: await this.getSession()
     // });
@@ -87,28 +92,29 @@ export class UserService {
     // await customer.save({
     //   update: true,
     // })
-    // const shop = await (await this.getSession(id)).shop;
+    const shop = await (await this.getSession(token)).shop;
     const newCustomer: customerEntity = {
       id: this.generateUniqueNumberId(),
       name: createCustomerDto.name,
-      shop: createCustomerDto.shop,
+      shop: shop,
       email: createCustomerDto.email,
       country: createCustomerDto.country,
       city: createCustomerDto.city
     }
     await this.customerRepository.save(newCustomer);
   }
-  async saveProducts(id) {
+  async saveProducts(token) {
     const shopifyProducts = (await shopify.rest.Product.all({
-      session: await this.getSession(id)})).data;
+      session: await this.getSession(token)})).data;
+    console.log(shopifyProducts);
     const products = shopifyProducts.map(async(shopifyProduct) => {
       const product = new productEntity();
       product.id = shopifyProduct.id;
-      product.shop = await (await this.getSession(id)).shop;
+      product.shop = await (await this.getSession(token)).shop;
       product.title = shopifyProduct.title;
       product.body_html = shopifyProduct.body_html;
       // await this.productRepository.save(product);
-      this.productRepository
+      await this.productRepository
       .createQueryBuilder()
       .insert()
       .into(productEntity)
@@ -118,20 +124,20 @@ export class UserService {
     })
     // return "ok"
   }
-  async saveCustomers(id) {
-    // console.log(1)
+  async saveCustomers(token) {
     const shopifyCustomers = (await shopify.rest.Customer.all({
-      session: await this.getSession(id)})).data;
-    const customers = shopifyCustomers.map(async(shopifyCustomer) => {
+      session: await this.getSession(token)})).data;
+    // const shopifyCustomers = (await axios.get(`https://${id}.myshopify.com/admin/api/2023-04/customers.json`,{headers: {'X-Shopify-Access-Token': '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' }})).data
+    const customers = await shopifyCustomers.map(async(shopifyCustomer) => {
       const customer = new customerEntity();
       customer.id = shopifyCustomer.id;
-      customer.shop = await (await this.getSession(id)).shop;
+      customer.shop = await (await this.getSession(token)).shop;
       customer.name = `${shopifyCustomer.first_name} ${shopifyCustomer.last_name}`;
       customer.email = shopifyCustomer.email;
       customer.country = shopifyCustomer.country;
       customer.city = shopifyCustomer.city;
       // await this.customerRepository.save(customer);
-      this.customerRepository
+      await this.customerRepository
       .createQueryBuilder()
       .insert()
       .into(customerEntity)
@@ -139,6 +145,7 @@ export class UserService {
       .orUpdate({ conflict_target: ['id'], overwrite: ['name'] })
       .execute();
     })
+    // console.log(shopifyCustomers)
     // return "ok"
   }
 }

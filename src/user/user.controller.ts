@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, Res, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res, Param, Headers } from '@nestjs/common';
 import { UserService } from './user.service';
 // import { shopify } from 'src/main';
 import { CreateProductDto } from './createProduct.dto';
@@ -10,33 +10,36 @@ import { title } from 'process';
 export class UserController {
     constructor(private readonly userService: UserService){}
     @Get('products')
-    async getProducts(@Query() params: any)
+    async getProducts(@Query() params: any, @Headers() header)
     {   
-        params.id = `offline_${params.id}.myshopify.com`;
-        return await this.userService.getProducts(params.id);
+        // params.id = `offline_${params.id}.myshopify.com`;
+        const token = header.authorization.split(' ')[1]
+        return await this.userService.getProducts(token);
         // return params.id;
     }
     @Get('customers')
-    async getCustomers(@Query() params: any)
+    async getCustomers(@Query() params: any, @Headers() header)
     {
-        params.id = `offline_${params.id}.myshopify.com`;
-        return this.userService.getCustomers(params.id);
+        const token = header.authorization.split(' ')[1]
+        return await this.userService.getCustomers(token);
     }
     @Post('products')
-    async createProduct(@Body() createProductDto: CreateProductDto)
+    async createProduct(@Body() createProductDto: CreateProductDto, @Headers() header)
     {
+        const token = header.authorization.split(' ')[1]
         try {
-            await this.userService.createProducts(createProductDto);
+            await this.userService.createProducts(createProductDto, token);
             return "Created successfully!";
         } catch (error) {
             return error;
         }
     }
     @Post('customers')
-    async createCustomer(@Body() createCustomerDto: CreateCustomerDto)
+    async createCustomer(@Body() createCustomerDto: CreateCustomerDto, @Headers() header)
     {
+        const token = header.authorization.split(' ')[1]
         try {
-            await this.userService.createCustomers(createCustomerDto);
+            await this.userService.createCustomers(createCustomerDto, token);
             return "Created successfully!"
         } catch (error) {
             return error;
@@ -44,13 +47,12 @@ export class UserController {
         // return "Successfully created!";
     }
     @Get('receiveData')
-    async getDataFromShopify(@Query() params: any)
+    async getDataFromShopify(@Query() params: any, @Headers() header)
     {
-        console.log(1)
-        params.id = `offline_${params.id}.myshopify.com`;
+        const token = header.authorization.split(' ')[1]
         try {
-        await this.userService.saveCustomers(params.id);
-        await this.userService.saveProducts(params.id);
+        await this.userService.saveCustomers(token);
+        await this.userService.saveProducts(token);
         } catch (error) {
             return error;
         }
