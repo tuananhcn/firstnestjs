@@ -20,6 +20,6 @@ export class AppController {
       // return {get,url: `http://localhost:5173/` }
         return res.redirect(`/api/auth?shop=${shop}`)
       
-      return res.redirect('https://91fe-2402-800-61b3-3f08-d1fd-af05-8688-da6d.ngrok-free.app');
+      return res.redirect(`${process.env.ngrokFrontEnd}?token=${isChecked}`);
 }
 }

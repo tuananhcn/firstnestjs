@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -10,7 +10,7 @@ import { customerEntity } from './user/customerEntity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { shopify } from 'src/shopify';
 import { InvoicesModule } from './invoices/invoices.module';
-
+import {WebhookMiddleware} from 'src/user/webhook.middleware'
 @Module({
   imports: [AuthModule, ConfigModule.forRoot({isGlobal: true}), UserModule, TypeOrmModule.forRoot({
     type: 'mysql',
@@ -25,4 +25,10 @@ import { InvoicesModule } from './invoices/invoices.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+      consumer
+      .apply(WebhookMiddleware)
+      .forRoutes('user/productUpdate','user/customerUpdate','user/sessionDelete')
+  }
+}

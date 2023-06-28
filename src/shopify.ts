@@ -10,7 +10,7 @@ export const shopify = shopifyApi({
     apiSecretKey: process.env.apiSecretKey,
     scopes: process.env.scopes.split(','),
     hostName: process.env.hostName,
-    apiVersion: ApiVersion.July22,
+    apiVersion: ApiVersion.April23,
     isEmbeddedApp: true,
     hostScheme: 'http',
     restResources

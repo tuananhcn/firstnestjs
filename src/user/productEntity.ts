@@ -4,8 +4,8 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "ty
 export class productEntity{
     @PrimaryGeneratedColumn('uuid')
     id: number;
-    @Column()
-    shop: string;
+    
+    
     // @ManyToOne(() => sessionEntity, session => session.shop)
     // @JoinColumn({ name: 'shop', referencedColumnName: 'shop' })
     // session: sessionEntity;
@@ -15,4 +15,11 @@ export class productEntity{
 
     @Column({ nullable: true })
     body_html: string;
+    
+    @Column({ nullable: false })
+    shop: string;
+
+    @ManyToOne(() => sessionEntity, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'shop', referencedColumnName: 'shop'})
+    session: sessionEntity;
 }

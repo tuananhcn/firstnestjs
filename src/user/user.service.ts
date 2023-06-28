@@ -29,13 +29,14 @@ export class UserService {
     private readonly customerRepository: Repository<customerEntity>) { }
 
   async getSession(token) {
-    const shopifyToken = jwt.verify(token, process.env.secretToken).accessToken
-    const query = `SELECT * FROM session_entity where accessToken = "${shopifyToken}"`
+    const shop = jwt.verify(token, process.env.secretToken).shop
+    const query = `SELECT * FROM session_entity where shop = "${shop}"`
     const Session = (await this.sessionRepository.query(query))[0];
+    console.log(shop)
     Session.isOnline = (Session.isOnline == 1 ? true : false);
     return Session;
   }
-  generateUniqueNumberId():number {
+  generateUniqueNumberId(): number {
     const timestamp = Date.now().toString(); // Get current timestamp as a string
     const randomNum = Math.floor(Math.random() * 9000000000) + 1000000000; // Generate a random 10-digit number
     const uniqueId = parseInt(timestamp + randomNum.toString().slice(-3), 10);
@@ -55,31 +56,31 @@ export class UserService {
   }
   async createProducts(createProductDto: CreateProductDto, token) {
     // const client = new shopify.clients.Rest({
-    //   session: await this.getSession(),
+    //   session: await this.getSession(token),
     //   apiVersion: ApiVersion.January23,
     // });
     // const postResponse = await (client).post({
     //   path: 'products',
     //   data: {
     //     product: {
-    //       title: createUserDto.title
+    //       title: createProductDto.title
     //     }
     //   },
     //   type: DataType.JSON,
     // });
     // console.log(postResponse.body);
     // return postResponse;
-    // console.log(createProductDto);
-    // const shop = await (await this.getSession(id)).shop;    
+    console.log(createProductDto);
     const shop = await (await this.getSession(token)).shop;
-    const newProduct: productEntity = {
-      id: this.generateUniqueNumberId(),
-      title: createProductDto.title,
-      shop: shop,
-      body_html: createProductDto.body_html
-    }
-    console.log(createProductDto)
-    console.log(newProduct);
+    const newProduct = new productEntity()
+    //  = {
+    newProduct.id = this.generateUniqueNumberId();
+    newProduct.title = createProductDto.title;
+    newProduct.shop = shop;
+    newProduct.body_html = createProductDto.body_html;
+    // }
+    // console.log(createProductDto)
+    // console.log(newProduct);
     return this.productRepository.save(newProduct);
   }
   async createCustomers(createCustomerDto: CreateCustomerDto, token) {
@@ -93,59 +94,90 @@ export class UserService {
     //   update: true,
     // })
     const shop = await (await this.getSession(token)).shop;
-    const newCustomer: customerEntity = {
-      id: this.generateUniqueNumberId(),
-      name: createCustomerDto.name,
-      shop: shop,
-      email: createCustomerDto.email,
-      country: createCustomerDto.country,
-      city: createCustomerDto.city
-    }
+    const newCustomer = new customerEntity()
+    // = {
+    newCustomer.id = this.generateUniqueNumberId()
+    newCustomer.name = createCustomerDto.name
+    newCustomer.shop = shop
+    newCustomer.email = createCustomerDto.email
+    newCustomer.country = createCustomerDto.country
+    newCustomer.city = createCustomerDto.city
+    // }
     await this.customerRepository.save(newCustomer);
   }
-  async saveProducts(token) {
+  async saveProducts(vendor) {
+    const query = `SELECT * FROM session_entity where shop = "${vendor}"`
+    const session = (await this.sessionRepository.query(query))[0];
+    session.isOnline = (session.isOnline == 1 ? true : false);
     const shopifyProducts = (await shopify.rest.Product.all({
-      session: await this.getSession(token)})).data;
-    console.log(shopifyProducts);
-    const products = shopifyProducts.map(async(shopifyProduct) => {
+      session: session
+    })).data;
+    // console.log(shopifyProducts);
+    const products = shopifyProducts.map(async (shopifyProduct) => {
       const product = new productEntity();
       product.id = shopifyProduct.id;
-      product.shop = await (await this.getSession(token)).shop;
+      product.shop = `${vendor}`;
       product.title = shopifyProduct.title;
       product.body_html = shopifyProduct.body_html;
       // await this.productRepository.save(product);
       await this.productRepository
-      .createQueryBuilder()
-      .insert()
-      .into(productEntity)
-      .values(product)
-      .orUpdate({ conflict_target: ['id'], overwrite: ['title'] })
-      .execute();
+        .createQueryBuilder()
+        .insert()
+        .into(productEntity)
+        .values(product)
+        .orUpdate({ conflict_target: ['id'], overwrite: ['title'] })
+        .execute();
     })
     // return "ok"
   }
-  async saveCustomers(token) {
+  async saveCustomers(vendor) {
+    // let session = (await this.sessionRepository.findOneBy({shop: `${vendor}.myshopify.com`}))
+    // session.isOnline = (session.isOnline == 1 ? true : false);
+    const query = `SELECT * FROM session_entity where shop = "${vendor}"`
+    const session = (await this.sessionRepository.query(query))[0];
+    session.isOnline = (session.isOnline == 1 ? true : false);
     const shopifyCustomers = (await shopify.rest.Customer.all({
-      session: await this.getSession(token)})).data;
-    // const shopifyCustomers = (await axios.get(`https://${id}.myshopify.com/admin/api/2023-04/customers.json`,{headers: {'X-Shopify-Access-Token': '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' }})).data
-    const customers = await shopifyCustomers.map(async(shopifyCustomer) => {
+      session: session
+    })).data;
+    const customers = await shopifyCustomers.map(async (shopifyCustomer) => {
       const customer = new customerEntity();
       customer.id = shopifyCustomer.id;
-      customer.shop = await (await this.getSession(token)).shop;
+      customer.shop = `${vendor}`;
       customer.name = `${shopifyCustomer.first_name} ${shopifyCustomer.last_name}`;
       customer.email = shopifyCustomer.email;
       customer.country = shopifyCustomer.country;
       customer.city = shopifyCustomer.city;
       // await this.customerRepository.save(customer);
       await this.customerRepository
-      .createQueryBuilder()
-      .insert()
-      .into(customerEntity)
-      .values(customer)
-      .orUpdate({ conflict_target: ['id'], overwrite: ['name'] })
-      .execute();
+        .createQueryBuilder()
+        .insert()
+        .into(customerEntity)
+        .values(customer)
+        .orUpdate({ conflict_target: ['id'], overwrite: ['name'] })
+        .execute();
     })
     // console.log(shopifyCustomers)
     // return "ok"
+  }
+  async deleteSession(vendor) {
+    // Session is built by the OAuth process
+    // const query1 = `SELECT * FROM session_entity where shop = "${vendor}"`
+    // const session = (await this.sessionRepository.query(query1))[0];
+    // console.log(session)
+    // let response = await shopify.rest.Webhook.all({
+    //   session: session,
+    // });
+    // const webhooks = response.data
+    // console.log(webhooks)
+
+    // webhooks.map(async (webhook) => {
+    //   await shopify.rest.Webhook.delete({
+    //     session: session,
+    //     id: webhook.id,
+    //   })
+    // });
+    const query = `DELETE FROM session_entity where shop = "${vendor}"`
+    await this.sessionRepository.query(query);
+    // webhooks.map((webhook)=>webhook.id)
   }
 }
